@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="cs">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kámen, nůžky, papír</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        nav {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+        }
+
+        .container {
+            padding: 20px;
+            margin-top: 50px;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+        .background-section {
+            position: relative;
+            background-image: url('https://i.postimg.cc/Qx0hT0Fz/People.webp');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            min-height: 60vh;
+        }
+
+        .background-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            z-index: 0;
+        }
+
+        .background-section > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .choices {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .player1 {
+            color: yellow;
+        }
+
+        .player2 {
+            color: orange;
+        }
+
+        .tie {
+            color: orange;
+        }
+
+        footer {
+            margin-top: 20px;
+        }
+
+        @keyframes typing {
+            from {
+                width: 0;
+            }
+            to {
+                width: 100%;
+            }
+        }
+
+        .typing {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 4s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes blink-caret {
+            from,
+            to {
+                border-color: transparent;
+            }
+            50% {
+                border-color: transparent;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .background-section {
+                padding: 20px;
+            }
+
+            .choices {
+                flex-direction: column;
+            }
+
+            .choices button {
+                margin-bottom: 10px;
+            }
+
+            .result {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="container-fluid">
+        <ul>
+            <li><strong>Kámen, nůžky, papír</strong></li>
+        </ul>
+        <ul>
+            <li><a href="#">Domů</a></li>
+            <li><a href="#">O hře</a></li>
+            <li><a href="#" role="button">Kontakt</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <div class="background-section">
+            <hgroup>
+                <h2 id="task-title" class="typing">Kdo bude dnes mýt nádobí?</h2>
+                <h3 style="color: white;">Zahrajte si Kámen, nůžky, papír!</h3>
+            </hgroup>
+            <div id="player1-section">
+                <p class="player1">První hráč, vyberte jednu z možností:</p>
+                <div class="choices">
+                    <button onclick="choose('player1', 'kámen')">Kámen</button>
+                    <button onclick="choose('player1', 'nůžky')">Nůžky</button>
+                    <button onclick="choose('player1', 'papír')">Papír</button>
+                </div>
+            </div>
+            <div id="player2-section" style="display:none;">
+                <p class="player2">Druhý hráč, vyberte jednu z možností:</p>
+                <div class="choices">
+                    <button onclick="choose('player2', 'kámen')">Kámen</button>
+                    <button onclick="choose('player2', 'nůžky')">Nůžky</button>
+                    <button onclick="choose('player2', 'papír')">Papír</button>
+                </div>
+            </div>
+            <div class="result" id="result"></div>
+        </div>
+    </main>
+
+    <section aria-label="Fun Facts">
+        <div class="container">
+            <article>
+                <hgroup>
+                    <h2>Věděli jste?</h2>
+                    <h3>Zajímavosti o hře Kámen, nůžky, papír</h3>
+                </hgroup>
+                <ul>
+                    <li>Hra Kámen, nůžky, papír pochází z Číny a je stará více než 2000 let.</li>
+                    <li>Existují turnaje a šampionáty v této hře po celém světě.</li>
+                    <li>Strategie může zvýšit vaše šance na výhru, i když hra vypadá náhodně.</li>
+                </ul>
+            </article>
+        </div>
+    </section>
+
+    <footer class="container">
+        <small>&copy; 2024 Kámen, nůžky, papír</small>
+    </footer>
+
+    <script>
+        let player1Choice = '';
+        let player2Choice = '';
+
+        const tasks = [
+            'Kdo bude dnes mýt nádobí?',
+            'Kdo dnes půjde se psem?',
+            'Kdo bude dnes vysávat?',
+            'Kdo vynese odpadky?',
+            'Kdo dnes uklidí stůl?',
+            'Kdo připraví večeři?',
+            'Kdo zalije květiny?',
+            'Kdo umyje okna?',
+            'Kdo uvaří oběd?',
+            'Kdo půjde nakoupit?'
+        ];
+        let taskIndex = 0;
+
+        function changeTask() {
+            taskIndex = (taskIndex + 1) % tasks.length;
+            const taskTitle = document.getElementById('task-title');
+            taskTitle.classList.remove('typing');
+            setTimeout(() => {
+                taskTitle.innerText = tasks[taskIndex];
+                taskTitle.classList.add('typing');
+            }, 100); // Small delay to allow animation to reset
+        }
+
+        setInterval(changeTask, 5000);
+
+        function choose(player, choice) {
+            if (player === 'player1') {
+                player1Choice = choice;
+                document.getElementById('player1-section').style.display = 'none';
+                document.getElementById('player2-section').style.display = 'block';
+            } else {
+                player2Choice = choice;
+                determineWinner();
+            }
+        }
+
+        function determineWinner() {
+            let result = '';
+            let resultClass = '';
+
+            if (player1Choice === player2Choice) {
+                result = `Remíza! Oba jste zvolili ${player1Choice}.`;
+                resultClass = 'tie';
+            } else if (
+                (player1Choice === 'kámen' && player2Choice === 'nůžky') ||
+                (player1Choice === 'nůžky' && player2Choice === 'papír') ||
+                (player1Choice === 'papír' && player2Choice === 'kámen')
+            ) {
+                result = `Vyhrál první hráč! ${player1Choice} poráží ${player2Choice}.`;
+                resultClass = 'player1';
+            } else {
+                result = `Vyhrál druhý hráč! ${player2Choice} poráží ${player1Choice}.`;
+                resultClass = 'player2';
+            }
+
+            const resultElement = document.getElementById('result');
+            resultElement.innerText = result;
+            resultElement.className = `result ${resultClass}`;
+
+            document.getElementById('player1-section').style.display = 'none';
+            document.getElementById('player2-section').style.display = 'none';
+
+            setTimeout(() => {
+                document.getElementById('player1-section').style.display = 'block';
+                document.getElementById('player2-section').style.display = 'none';
+                resultElement.innerText = '';
+                player1Choice = '';
+                player2Choice = '';
+            }, 5000);
+        }
+    </script>
+</body>
+
+</html>
